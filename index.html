@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Professional Service Desk Ticketing Lab - ITSM portfolio project">
+  <title>ServiceDesk Pro | ITSM Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">SD</div>
+        <div>
+          <strong>ServiceDesk Pro</strong>
+          <span>ITSM Portfolio Lab</span>
+        </div>
+      </div>
+
+      <nav class="side-nav">
+        <button class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">▦</span>
+          Dashboard
+        </button>
+        <button class="nav-item" data-view="tickets">
+          <span class="nav-icon">◫</span>
+          Incidents
+          <span id="sidebarCount" class="nav-count">0</span>
+        </button>
+        <button class="nav-item" data-view="knowledge">
+          <span class="nav-icon">◧</span>
+          Knowledge
+        </button>
+        <button class="nav-item" data-view="analytics">
+          <span class="nav-icon">↗</span>
+          Analytics
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="analyst-card">
+          <div class="avatar">JP</div>
+          <div>
+            <strong>John Paul Gomez</strong>
+            <span>Service Desk Analyst</span>
+          </div>
+        </div>
+        <div class="lab-badge">PERSONAL LAB</div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">SERVICE OPERATIONS</div>
+          <h1 id="pageTitle">Support Dashboard</h1>
+        </div>
+
+        <div class="top-actions">
+          <div class="status-pill"><span></span> System Operational</div>
+          <button id="exportBtn" class="btn ghost">Export</button>
+          <button id="seedBtn" class="btn ghost">Demo Data</button>
+          <button id="newTicketBtn" class="btn primary">＋ New Incident</button>
+        </div>
+      </header>
+
+      <section id="dashboardView" class="view active">
+
+        <div class="metric-grid">
+          <article class="metric-card">
+            <div class="metric-top">
+              <span>Open Incidents</span>
+              <span class="metric-icon">◫</span>
+            </div>
+            <strong id="metricOpen">0</strong>
+            <small>Awaiting resolution</small>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-top">
+              <span>In Progress</span>
+              <span class="metric-icon">↻</span>
+            </div>
+            <strong id="metricProgress">0</strong>
+            <small>Actively being worked</small>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-top">
+              <span>SLA at Risk</span>
+              <span class="metric-icon alert">!</span>
+            </div>
+            <strong id="metricRisk">0</strong>
+            <small>Needs immediate attention</small>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-top">
+              <span>Resolved</span>
+              <span class="metric-icon success">✓</span>
+            </div>
+            <strong id="metricResolved">0</strong>
+            <small>Successfully completed</small>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="eyebrow">LIVE QUEUE</div>
+                <h2>Priority Incidents</h2>
+              </div>
+              <button class="text-btn" data-view-jump="tickets">View all →</button>
+            </div>
+            <div id="priorityQueue" class="priority-queue"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="eyebrow">QUEUE HEALTH</div>
+                <h2>Status Distribution</h2>
+              </div>
+            </div>
+            <div class="donut-wrap">
+              <div id="donutChart" class="donut-chart">
+                <div class="donut-center">
+                  <strong id="totalTickets">0</strong>
+                  <span>Total</span>
+                </div>
+              </div>
+              <div class="legend">
+                <div><span class="dot open"></span>Open <b id="legendOpen">0</b></div>
+                <div><span class="dot progress"></span>In Progress <b id="legendProgress">0</b></div>
+                <div><span class="dot pending"></span>Pending <b id="legendPending">0</b></div>
+                <div><span class="dot resolved"></span>Resolved <b id="legendResolved">0</b></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="eyebrow">RECENT ACTIVITY</div>
+              <h2>Latest Ticket Updates</h2>
+            </div>
+          </div>
+          <div id="activityFeed" class="activity-feed"></div>
+        </section>
+      </section>
+
+      <section id="ticketsView" class="view">
+        <section class="panel">
+          <div class="panel-header tickets-header">
+            <div>
+              <div class="eyebrow">INCIDENT MANAGEMENT</div>
+              <h2>Incident Queue</h2>
+            </div>
+
+            <div class="filters">
+              <div class="search-wrap">
+                <span>⌕</span>
+                <input id="searchInput" type="search" placeholder="Search incidents...">
+              </div>
+              <select id="statusFilter">
+                <option value="">All Statuses</option>
+                <option>Open</option>
+                <option>In Progress</option>
+                <option>Pending</option>
+                <option>Resolved</option>
+              </select>
+              <select id="priorityFilter">
+                <option value="">All Priorities</option>
+                <option>P1</option>
+                <option>P2</option>
+                <option>P3</option>
+                <option>P4</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Incident</th>
+                  <th>Requester</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Assignee</th>
+                  <th>SLA</th>
+                </tr>
+              </thead>
+              <tbody id="ticketTableBody"></tbody>
+            </table>
+          </div>
+
+          <div id="emptyTickets" class="empty-state">
+            <div class="empty-icon">◫</div>
+            <h3>No incidents found</h3>
+            <p>Create a new incident or load demo data.</p>
+          </div>
+        </section>
+      </section>
+
+      <section id="knowledgeView" class="view">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="eyebrow">KNOWLEDGE MANAGEMENT</div>
+              <h2>Support Knowledge Base</h2>
+            </div>
+          </div>
+
+          <div class="kb-grid">
+            <article class="kb-card">
+              <div class="kb-icon">VPN</div>
+              <span>KB-001</span>
+              <h3>VPN Connectivity Troubleshooting</h3>
+              <p>Validate internet access, credentials, client configuration, DNS, authentication errors, and gateway scope.</p>
+              <button class="text-btn kb-open" data-kb="vpn">Open article →</button>
+            </article>
+            <article class="kb-card">
+              <div class="kb-icon">MFA</div>
+              <span>KB-002</span>
+              <h3>Microsoft 365 MFA Sign-In Issues</h3>
+              <p>Identity verification, account status, authentication methods, re-registration, and escalation guidance.</p>
+              <button class="text-btn kb-open" data-kb="mfa">Open article →</button>
+            </article>
+            <article class="kb-card">
+              <div class="kb-icon">AD</div>
+              <span>KB-003</span>
+              <h3>Repeated Active Directory Lockout</h3>
+              <p>Check stale credentials, mapped drives, VPN clients, Outlook, services, scheduled tasks, and mobile devices.</p>
+              <button class="text-btn kb-open" data-kb="ad">Open article →</button>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section id="analyticsView" class="view">
+        <div class="analytics-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div><div class="eyebrow">SERVICE PERFORMANCE</div><h2>Resolution Snapshot</h2></div>
+            </div>
+            <div class="analytics-cards">
+              <div><span>Total Tickets</span><strong id="aTotal">0</strong></div>
+              <div><span>Resolved</span><strong id="aResolved">0</strong></div>
+              <div><span>Resolution Rate</span><strong id="aRate">0%</strong></div>
+              <div><span>SLA Risk</span><strong id="aRisk">0</strong></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div><div class="eyebrow">CATEGORY BREAKDOWN</div><h2>Ticket Volume by Category</h2></div>
+            </div>
+            <div id="categoryBars" class="bar-list"></div>
+          </section>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop"></div>
+
+  <section id="ticketModal" class="modal">
+    <div class="modal-header">
+      <div>
+        <div id="modalEyebrow" class="eyebrow">NEW INCIDENT</div>
+        <h2 id="modalTitle">Create Incident</h2>
+      </div>
+      <button class="icon-btn close-modal">×</button>
+    </div>
+
+    <div class="modal-body">
+      <form id="ticketForm">
+        <div class="form-grid">
+          <label>
+            Requester
+            <input id="requester" required placeholder="e.g. Maria Santos">
+          </label>
+          <label>
+            Assignee
+            <input id="assignee" placeholder="Service Desk L1">
+          </label>
+        </div>
+
+        <label>
+          Subject
+          <input id="subject" required placeholder="Short incident summary">
+        </label>
+
+        <label>
+          Description
+          <textarea id="description" rows="4" required placeholder="Describe the symptoms, business impact, and relevant error messages"></textarea>
+        </label>
+
+        <div class="form-grid three">
+          <label>
+            Category
+            <select id="category">
+              <option>Identity & Access</option>
+              <option>Microsoft 365</option>
+              <option>Network / VPN</option>
+              <option>Windows / Endpoint</option>
+              <option>Hardware</option>
+              <option>Software</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label>
+            Impact
+            <select id="impact">
+              <option>Low</option>
+              <option selected>Medium</option>
+              <option>High</option>
+            </select>
+          </label>
+          <label>
+            Urgency
+            <select id="urgency">
+              <option>Low</option>
+              <option selected>Medium</option>
+              <option>High</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="priority-preview">
+          <span>Calculated Priority</span>
+          <strong id="priorityPreview" class="priority-badge P3">P3</strong>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn ghost close-modal">Cancel</button>
+          <button type="submit" class="btn primary">Create Incident</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="detailModal" class="modal detail-modal">
+    <div class="modal-header">
+      <div>
+        <div id="detailNumber" class="eyebrow"></div>
+        <h2 id="detailSubject"></h2>
+      </div>
+      <button class="icon-btn close-modal">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-summary">
+        <p id="detailDescription"></p>
+        <span id="detailPriority" class="priority-badge"></span>
+      </div>
+
+      <div class="detail-meta">
+        <div><span>Requester</span><strong id="detailRequester"></strong></div>
+        <div><span>Category</span><strong id="detailCategory"></strong></div>
+        <div><span>Impact</span><strong id="detailImpact"></strong></div>
+        <div><span>Urgency</span><strong id="detailUrgency"></strong></div>
+        <div><span>Created</span><strong id="detailCreated"></strong></div>
+        <div><span>SLA Due</span><strong id="detailSla"></strong></div>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          Status
+          <select id="detailStatus">
+            <option>Open</option>
+            <option>In Progress</option>
+            <option>Pending</option>
+            <option>Resolved</option>
+          </select>
+        </label>
+        <label>
+          Assignee
+          <input id="detailAssignee">
+        </label>
+      </div>
+
+      <section class="notes-block">
+        <div class="panel-header">
+          <div><div class="eyebrow">WORK NOTES</div><h3>Troubleshooting Timeline</h3></div>
+        </div>
+        <div id="notesList" class="notes-list"></div>
+        <div class="note-compose">
+          <textarea id="noteText" rows="3" placeholder="Add troubleshooting step, user update, escalation note, or resolution..."></textarea>
+          <button id="addNoteBtn" class="btn primary" type="button">Add Note</button>
+        </div>
+      </section>
+
+      <div class="modal-actions">
+        <button id="deleteTicketBtn" class="btn danger" type="button">Delete Incident</button>
+        <div class="spacer"></div>
+        <button class="btn ghost close-modal" type="button">Cancel</button>
+        <button id="saveTicketBtn" class="btn primary" type="button">Save Changes</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="kbModal" class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="eyebrow">KNOWLEDGE ARTICLE</div>
+        <h2 id="kbTitle"></h2>
+      </div>
+      <button class="icon-btn close-modal">×</button>
+    </div>
+    <div id="kbContent" class="modal-body article-body"></div>
+  </section>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
